@@ -1,10 +1,11 @@
 package com.example.leaguesfootballv2.data.repository
 
 import com.example.leaguesfootballv2.data.datasource.LeaguesDataSource
-import com.example.leaguesfootballv2.data.mock.AllLeaguesMockResponse
+import com.example.leaguesfootballv2.data.mock.AllLeaguesJsonResponseMock
 import com.example.leaguesfootballv2.data.transformer.LeaguesToDomainTransformer
 import com.example.leaguesfootballv2.domain.model.LeagueEntity
 import com.example.leaguesfootballv2.core.Result
+import com.example.leaguesfootballv2.data.mock.AllLeaguesMock
 import kotlinx.coroutines.test.runTest
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.Assertions.*
@@ -27,32 +28,17 @@ internal class LeaguesRepositoryImplTest {
     @InjectMocks
     private lateinit var repository: LeaguesRepositoryImpl
 
-    private val leagues = listOf(
-        LeagueEntity(
-            idLeague = "4328",
-            strLeague = "English Premier League",
-            strSport = "Soccer",
-            strLeagueAlternate = "Premier League, EPL"
-        ),
-        LeagueEntity(
-            idLeague = "4329",
-            strLeague = "English League Championship",
-            strSport = "Soccer",
-            strLeagueAlternate = "Championship"
-        ),
-    )
-
     @Test
     fun `fetchAllLeagues - when data source call is success - then should return Success with data`() = runTest {
         // Given
-        given(dataSource.execute(param = Unit)).willReturn(AllLeaguesMockResponse.jsonAllLeagues)
-        given(transformer.toDomain(jsonLeagues = AllLeaguesMockResponse.jsonAllLeagues)).willReturn(leagues)
+        given(dataSource.execute(param = Unit)).willReturn(AllLeaguesJsonResponseMock.jsonAllLeagues)
+        given(transformer.toDomain(jsonLeagues = AllLeaguesJsonResponseMock.jsonAllLeagues)).willReturn(AllLeaguesMock.leagues)
 
         // When
         val result = repository.fetchAllLeagues()
 
         // Then
-        assertThat(result).isEqualTo(Result.Success(data = leagues))
+        assertThat(result).isEqualTo(Result.Success(data = AllLeaguesMock.leagues))
     }
 
     @Test

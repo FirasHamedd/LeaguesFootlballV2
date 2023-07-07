@@ -17,7 +17,7 @@ data class JsonLeague(
     @JsonProperty("idLeague")
     val idLeague: String,
     @JsonProperty("strLeague")
-    val strLeague: String?,
+    val strLeague: String,
     @JsonProperty("strSport")
     val strSport: String,
     @JsonProperty("strLeagueAlternate")

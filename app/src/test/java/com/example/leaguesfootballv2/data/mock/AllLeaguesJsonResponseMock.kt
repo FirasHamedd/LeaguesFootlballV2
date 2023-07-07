@@ -3,7 +3,7 @@ package com.example.leaguesfootballv2.data.mock
 import com.example.leaguesfootballv2.data.model.JsonLeague
 import com.example.leaguesfootballv2.data.model.JsonLeagues
 
-object AllLeaguesMockResponse {
+object AllLeaguesJsonResponseMock {
      val jsonAllLeagues = JsonLeagues(
         leagues = listOf(
             JsonLeague(
