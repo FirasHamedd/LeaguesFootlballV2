@@ -1,8 +1,7 @@
 package com.example.leaguesfootballv2.data.datasource
 
 import com.example.leaguesfootballv2.core.network.ApiService
-import com.example.leaguesfootballv2.data.model.JsonLeague
-import com.example.leaguesfootballv2.data.model.JsonLeagues
+import com.example.leaguesfootballv2.data.mock.AllLeaguesMockResponse
 import kotlinx.coroutines.test.*
 import okhttp3.*
 import org.assertj.core.api.Assertions.assertThat
@@ -25,34 +24,16 @@ class LeaguesDataSourceTest {
     @InjectMocks
     private lateinit var dataSource: LeaguesDataSource
 
-    private val response = JsonLeagues(
-        leagues = listOf(
-            JsonLeague(
-                idLeague = "4328",
-                strLeague = "English Premier League",
-                strSport = "Soccer",
-                strLeagueAlternate = "Premier League, EPL"
-            ),
-            JsonLeague(
-                idLeague = "4329",
-                strLeague = "English League Championship",
-                strSport = "Soccer",
-                strLeagueAlternate = "Championship"
-            ),
-        )
-    )
-
-
     @Test
     fun `execute - when response body is not null - then should return JsonLeagues`() = runTest {
         // Given
-        given(apiService.getAllLeagues()).willReturn(Response.success(response))
+        given(apiService.getAllLeagues()).willReturn(Response.success(AllLeaguesMockResponse.jsonAllLeagues))
 
         // When
         val result = dataSource.execute(param = Unit)
 
         // Then
-        assertThat(result).isEqualTo(response)
+        assertThat(result).isEqualTo(AllLeaguesMockResponse.jsonAllLeagues)
     }
 
     @Test

@@ -7,7 +7,7 @@ import javax.inject.Inject
 
 class LeaguesDataSource @Inject constructor(
     private val apiService: ApiService
-): DataSource<Unit, JsonLeagues> {
+) : DataSource<Unit, JsonLeagues> {
 
     override suspend fun execute(param: Unit): JsonLeagues {
         return apiService.getAllLeagues().body() ?: throw Exception()
