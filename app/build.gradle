@@ -30,6 +30,10 @@ android {
     kotlinOptions {
         jvmTarget = '1.8'
     }
+
+    tasks.withType(Test) {
+        useJUnitPlatform()
+    }
 }
 
 dependencies {
@@ -58,4 +62,15 @@ dependencies {
     // Hilt
     implementation "com.google.dagger:hilt-android:$versions.hilt"
     kapt "com.google.dagger:hilt-compiler:$versions.hilt"
+
+    // Test
+    testRuntimeOnly "org.junit.jupiter:junit-jupiter-engine:$versions.tests.jupiter_engine"
+    testImplementation "junit:junit:$versions.tests.junit"
+    testImplementation "org.mockito:mockito-core:$versions.tests.mockito_core"
+    testImplementation "org.mockito.kotlin:mockito-kotlin:$versions.tests.mockito_kotlin"
+    testImplementation "org.junit.jupiter:junit-jupiter-api:$versions.tests.jupiter_api"
+    testImplementation "org.mockito:mockito-junit-jupiter:$versions.tests.mockito_junit"
+    testImplementation "org.assertj:assertj-core:$versions.tests.assertj_version"
+    testImplementation "com.squareup.okhttp3:mockwebserver:$versions.okhttp"
+    testImplementation "org.jetbrains.kotlinx:kotlinx-coroutines-test:$versions.tests.kotlinx_coroutines_test_version"
 }
