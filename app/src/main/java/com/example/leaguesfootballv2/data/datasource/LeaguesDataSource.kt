@@ -10,6 +10,6 @@ class LeaguesDataSource @Inject constructor(
 ) : DataSource<Unit, JsonLeagues> {
 
     override suspend fun execute(param: Unit): JsonLeagues {
-        return apiService.getAllLeagues().body() ?: throw Exception()
+        return apiService.fetchAllLeagues().body() ?: throw Exception()
     }
 }
