@@ -1,9 +1,11 @@
 package com.example.leaguesfootballv2.presentation.viewmodel
 
-import com.example.leaguesfootballv2.domain.interactor.LeaguesInteractor
 import com.example.leaguesfootballv2.core.Result
 import com.example.leaguesfootballv2.data.mock.AllLeaguesMock
+import com.example.leaguesfootballv2.data.mock.TeamsMock
+import com.example.leaguesfootballv2.domain.interactor.LeaguesInteractor
 import com.example.leaguesfootballv2.presentation.state.LeaguesUiState
+import com.example.leaguesfootballv2.presentation.state.TeamsUiState
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.test.*
@@ -75,5 +77,38 @@ internal class LeaguesViewModelTest {
         // Then
         scheduler.advanceUntilIdle()
         assertThat(viewModel.leaguesUiState.value).isEqualTo(LeaguesUiState.Error)
+    }
+
+    @Test
+    fun `getTeamsByLeague - when Result is Success - then should update teamsUiState`() = runTest {
+        // Given
+        given(interactor.getTeamsByLeague(league = "league")).willReturn(Result.Success(data = TeamsMock.teams))
+
+        // When
+        viewModel.getTeamsByLeague(league = "league")
+
+        // Then
+        scheduler.advanceUntilIdle()
+        assertThat(viewModel.teamsUiState.value).isEqualTo(
+            TeamsUiState.Ready(
+                teamsPics = listOf(
+                    "arsenalBageUrl",
+                    "manchesterBageUrl"
+                )
+            )
+        )
+    }
+
+    @Test
+    fun `getTeamsByLeague - when Result is Failure - then should update teamsUiState`() = runTest {
+        // Given
+        given(interactor.getTeamsByLeague("league")).willReturn(Result.Failure())
+
+        // When
+        viewModel.getTeamsByLeague("league")
+
+        // Then
+        scheduler.advanceUntilIdle()
+        assertThat(viewModel.teamsUiState.value).isEqualTo(TeamsUiState.Error)
     }
 }
