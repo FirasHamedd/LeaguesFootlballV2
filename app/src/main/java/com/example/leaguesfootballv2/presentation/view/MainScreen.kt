@@ -12,13 +12,29 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.tooling.preview.Preview
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.example.leaguesfootballv2.R
+import com.example.leaguesfootballv2.presentation.state.LeaguesUiState
 import com.example.leaguesfootballv2.presentation.view.composable.AutoCompleteSearchBar
+import com.example.leaguesfootballv2.presentation.viewmodel.LeaguesViewModel
 
 @Composable
-fun MainScreen() {
-    val leagues = listOf("Liga", "Ligue 1", "Premier League", "Bundesliga", "Eredivisie", "Serie A")
+fun MainScreen(viewModel: LeaguesViewModel) {
+    val allLeaguesUiState by viewModel.leaguesUiState.collectAsStateWithLifecycle()
+    MainScreenContent(allLeaguesUiState = allLeaguesUiState)
+}
+
+@Composable
+fun MainScreenContent(allLeaguesUiState: LeaguesUiState) {
+    var allLeagues by remember { mutableStateOf(emptyList<String>()) }
     val isUserTyping = remember { mutableStateOf(false) }
+
+    when (allLeaguesUiState) {
+        is LeaguesUiState.Idle -> println("hooo idle")
+        is LeaguesUiState.Loading -> println("hooo loading")
+        is LeaguesUiState.Ready -> allLeagues = allLeaguesUiState.leagues
+        is LeaguesUiState.Error -> println("hooo Error")
+    }
 
     Column(
         modifier = Modifier
@@ -29,7 +45,7 @@ fun MainScreen() {
     ) {
         AutoCompleteSearchBar(
             modifier = Modifier.fillMaxWidth(),
-            items = leagues,
+            items = allLeagues,
             isUserTyping = isUserTyping,
             onSearchClicked = {
                 println("hooo $it")
@@ -45,7 +61,7 @@ fun MainScreen() {
                     modifier = Modifier.align(Alignment.Center)
                 )
             }
-        }else {
+        } else {
             Box(
                 modifier = Modifier
                     .fillMaxSize()
@@ -64,5 +80,16 @@ fun MainScreen() {
 @Preview(name = "MainScreen")
 @Composable
 fun MainScreenPreview() {
-    MainScreen()
+    MainScreenContent(
+        allLeaguesUiState = LeaguesUiState.Ready(
+            leagues = listOf(
+                "Liga",
+                "Ligue 1",
+                "Premier League",
+                "Bundesliga",
+                "Eredivisie",
+                "Serie A"
+            )
+        ),
+    )
 }

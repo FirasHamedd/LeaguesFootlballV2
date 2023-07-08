@@ -62,6 +62,7 @@ dependencies {
     implementation "androidx.compose.foundation:foundation:$versions.compose.compose"
     implementation "androidx.compose.material3:material3:$versions.compose.material_3"
     implementation "io.coil-kt:coil-compose:$versions.compose.coil"
+    implementation "androidx.lifecycle:lifecycle-runtime-compose:$versions.compose.lifecycle_runtime"
 
     // Kotlin
     implementation "org.jetbrains.kotlin:kotlin-reflect:$versions.kotlin"
