@@ -4,7 +4,7 @@
 
 def compile_sdk_version = 33
 def target_sdk_version = 33
-def min_sdk_version = 21
+def min_sdk_version = 24
 
 def android = [:]
 android.gradle_experimental = "0.11.1"
@@ -29,6 +29,14 @@ tests.assertj_version = "3.10.0"
 tests.mockito_core = "5.4.0"
 tests.mockito_junit = "5.4.0"
 tests.mockito_kotlin = "5.0.0"
+
+def compose = [:]
+compose.activity_compose = "1.4.0"
+compose.compose = "1.3.0"
+compose.material_3 = "1.0.1"
+compose.material = "1.3.0"
+compose.coil = "2.2.2"
+compose.compose_compiler_version = '1.3.2'
 
 def kotlin = "1.7.20"
 
@@ -55,4 +63,5 @@ ext.versions.lifecycle = lifecycle
 ext.versions.hilt = hilt
 ext.versions.okhttp = okhttp
 ext.versions.tests = tests
+ext.versions.compose = compose
 
