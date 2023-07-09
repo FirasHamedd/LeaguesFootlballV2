@@ -3,13 +3,11 @@ package com.example.leaguesfootballv2.data.datasource
 import com.example.leaguesfootballv2.core.local.TeamsByLeagueDao
 import com.example.leaguesfootballv2.data.mock.TeamsJsonResponseMock
 import kotlinx.coroutines.test.runTest
-import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.extension.ExtendWith
 import org.mockito.InjectMocks
 import org.mockito.Mock
 import org.mockito.junit.jupiter.MockitoExtension
-import org.mockito.kotlin.given
 import org.mockito.kotlin.then
 
 @ExtendWith(MockitoExtension::class)
@@ -23,14 +21,12 @@ internal class LocalTeamsDataSourceTest {
 
     @Test
     fun execute() = runTest {
-        // Given
-        given(teamsByLeagueDao.getTeams()).willReturn(TeamsJsonResponseMock.jsonTeams.teams)
-
         // When
-        val result = dataSource.execute(param = Unit)
+        dataSource.execute(param = Unit)
 
         // Then
-        assertThat(result).isEqualTo(TeamsJsonResponseMock.jsonTeams.teams)
+        then(teamsByLeagueDao).should().getTeams()
+        then(teamsByLeagueDao).shouldHaveNoMoreInteractions()
     }
 
     @Test

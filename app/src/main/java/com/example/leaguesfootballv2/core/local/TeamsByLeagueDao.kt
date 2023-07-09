@@ -5,12 +5,13 @@ import androidx.room.Insert
 import androidx.room.OnConflictStrategy
 import androidx.room.Query
 import com.example.leaguesfootballv2.data.model.JsonTeam
+import kotlinx.coroutines.flow.Flow
 
 @Dao
 interface TeamsByLeagueDao {
 
     @Query("SELECT * FROM teams")
-    suspend fun getTeams(): List<JsonTeam>
+    fun getTeams(): Flow<List<JsonTeam>>
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     suspend fun insertAll(teams: List<JsonTeam>)

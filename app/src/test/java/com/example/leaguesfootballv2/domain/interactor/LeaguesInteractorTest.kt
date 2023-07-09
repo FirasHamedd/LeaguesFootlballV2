@@ -5,6 +5,8 @@ import com.example.leaguesfootballv2.data.mock.TeamsMock
 import com.example.leaguesfootballv2.domain.model.TeamEntity
 import com.example.leaguesfootballv2.domain.repository.LeaguesRepository
 import com.example.leaguesfootballv2.domain.repository.TeamsRepository
+import kotlinx.coroutines.flow.flowOf
+import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.test.runTest
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.Assertions.*
@@ -83,17 +85,18 @@ internal class LeaguesInteractorTest {
 
     @Test
     fun `getPersistedTeams - when result is Success - then should return Success with sorted list`() =
-        runTest {
+        runBlocking {
             // Given
-            given(teamsRepository.fetchPersistedTeams()).willReturn(Result.Success(data = TeamsMock.teams))
+            val flow = flowOf(TeamsMock.teams)
+            given(teamsRepository.fetchPersistedTeams()).willReturn(flow)
 
             // When
             val result = interactor.getPersistedTeams()
 
             // Then
-            assertThat(result).isEqualTo(
-                Result.Success(
-                    data = listOf(
+            result.collect {
+                assertThat(it).isEqualTo(
+                    listOf(
                         TeamEntity(
                             idTeam = "14444",
                             strTeam = "Manchester United",
@@ -108,19 +111,6 @@ internal class LeaguesInteractorTest {
                         )
                     )
                 )
-            )
-        }
-
-    @Test
-    fun `getPersistedTeams - when result is Failure - then should return Failure`() =
-        runTest {
-            // Given
-            given(teamsRepository.fetchPersistedTeams()).willReturn(Result.Failure())
-
-            // When
-            val result = interactor.getPersistedTeams()
-
-            // Then
-            assertThat(result).isEqualTo(Result.Failure<List<TeamEntity>>())
+            }
         }
 }

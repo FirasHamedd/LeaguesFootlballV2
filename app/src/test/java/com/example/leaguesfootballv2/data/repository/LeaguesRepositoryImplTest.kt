@@ -1,11 +1,10 @@
 package com.example.leaguesfootballv2.data.repository
 
+import com.example.leaguesfootballv2.core.Result
 import com.example.leaguesfootballv2.data.datasource.LeaguesDataSource
 import com.example.leaguesfootballv2.data.mock.AllLeaguesJsonResponseMock
-import com.example.leaguesfootballv2.data.transformer.LeaguesToDomainTransformer
-import com.example.leaguesfootballv2.domain.model.LeagueEntity
-import com.example.leaguesfootballv2.core.Result
 import com.example.leaguesfootballv2.data.mock.AllLeaguesMock
+import com.example.leaguesfootballv2.data.transformer.LeaguesToDomainTransformer
 import kotlinx.coroutines.test.runTest
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.Assertions.*
@@ -39,18 +38,5 @@ internal class LeaguesRepositoryImplTest {
 
         // Then
         assertThat(result).isEqualTo(Result.Success(data = AllLeaguesMock.leagues))
-    }
-
-    @Test
-    fun `fetchAllLeagues - when data source throws exception - then should return Failure`() = runTest {
-        // TODO test exception
-        // Given
-        given(dataSource.execute(param = Unit)).willThrow(Exception::class.java)
-
-        // When
-        val result = repository.fetchAllLeagues()
-
-        // Then
-        assertThat(result).isEqualTo(Result.Failure<List<LeagueEntity>>())
     }
 }

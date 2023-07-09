@@ -10,6 +10,7 @@ import com.example.leaguesfootballv2.presentation.state.TeamsUiState
 import com.example.leaguesfootballv2.presentation.transformer.TeamsToDisplayTransformer
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.test.*
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.AfterEach
@@ -88,29 +89,14 @@ internal class LeaguesViewModelTest {
     @Test
     fun `getTeamsByLeague - when Result is Success - then should update teamsUiState`() = runTest {
         // Given
-        val displayModels = listOf(
-            TeamDisplayModel(
-                teamId = "14444",
-                teamName = "Arsenal",
-                teamLogo = "arsenalBageUrl"
-            ),
-            TeamDisplayModel(
-                teamId = "133604",
-                teamName = "Manchester United",
-                teamLogo = "manchesterBageUrl"
-            ),
-        )
         given(interactor.getTeamsByLeague(league = "league")).willReturn(Result.Success(data = TeamsMock.teams))
-        given(transformer.teamsToDisplayModel(teams = TeamsMock.teams)).willReturn(displayModels)
 
         // When
         viewModel.getTeamsByLeague(league = "league")
 
         // Then
         scheduler.advanceUntilIdle()
-        assertThat(viewModel.teamsUiState.value).isEqualTo(
-            TeamsUiState.Ready(teams = displayModels)
-        )
+        assertThat(viewModel.teamsUiState.value).isEqualTo(TeamsUiState.Idle)
     }
 
     @Test
@@ -141,7 +127,8 @@ internal class LeaguesViewModelTest {
                 teamLogo = "manchesterBageUrl"
             ),
         )
-        given(interactor.getPersistedTeams()).willReturn(Result.Success(data = TeamsMock.teams))
+        val flow = flowOf(value = TeamsMock.teams)
+        given(interactor.getPersistedTeams()).willReturn(flow)
         given(transformer.teamsToDisplayModel(teams = TeamsMock.teams)).willReturn(displayModels)
 
         // When
@@ -152,18 +139,5 @@ internal class LeaguesViewModelTest {
         assertThat(viewModel.teamsUiState.value).isEqualTo(
             TeamsUiState.Ready(teams = displayModels)
         )
-    }
-
-    @Test
-    fun `getPersistedTeams - when Result is Failure - then should update teamsUiState`() = runTest {
-        // Given
-        given(interactor.getPersistedTeams()).willReturn(Result.Failure())
-
-        // When
-        viewModel.getPersistedTeams()
-
-        // Then
-        scheduler.advanceUntilIdle()
-        assertThat(viewModel.teamsUiState.value).isEqualTo(TeamsUiState.Error)
     }
 }

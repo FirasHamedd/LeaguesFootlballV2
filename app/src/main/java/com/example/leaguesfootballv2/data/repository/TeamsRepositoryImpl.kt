@@ -6,6 +6,8 @@ import com.example.leaguesfootballv2.data.datasource.TeamsDataSource
 import com.example.leaguesfootballv2.data.transformer.TeamsToDomainTransformer
 import com.example.leaguesfootballv2.domain.model.TeamEntity
 import com.example.leaguesfootballv2.domain.repository.TeamsRepository
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.map
 import javax.inject.Inject
 
 class TeamsRepositoryImpl @Inject constructor(
@@ -23,11 +25,8 @@ class TeamsRepositoryImpl @Inject constructor(
         Result.Failure(exception = e)
     }
 
-    override suspend fun fetchPersistedTeams(): Result<List<TeamEntity>> = try {
-        localTeamsDataSource.execute(param = Unit).let { jsonTeams ->
-            Result.Success(data = transformer.toDomain(jsonTeams = jsonTeams))
+    override suspend fun fetchPersistedTeams(): Flow<List<TeamEntity>> =
+        localTeamsDataSource.execute(param = Unit).map { persistedTeams ->
+            transformer.toDomain(jsonTeams = persistedTeams)
         }
-    } catch (e: Exception) {
-        Result.Failure()
-    }
 }

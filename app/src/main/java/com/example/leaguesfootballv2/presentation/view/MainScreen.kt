@@ -36,10 +36,6 @@ fun MainScreen(
 ) {
     val allLeaguesUiState by viewModel.leaguesUiState.collectAsStateWithLifecycle()
     val teamsByLeagueUiState by viewModel.teamsUiState.collectAsStateWithLifecycle()
-    LaunchedEffect(key1 = Unit) {
-        viewModel.getAllLeagues()
-        viewModel.getPersistedTeams()
-    }
     MainScreenContent(
         allLeaguesUiState = allLeaguesUiState,
         teamsByLeagueUiState = teamsByLeagueUiState,

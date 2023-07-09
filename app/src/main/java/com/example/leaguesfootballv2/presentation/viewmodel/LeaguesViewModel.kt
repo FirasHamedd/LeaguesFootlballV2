@@ -37,19 +37,17 @@ class LeaguesViewModel @Inject constructor(
 
     fun getTeamsByLeague(league: String) = viewModelScope.launch(context = dispatcher) {
         _teamsUiState.value = interactor.getTeamsByLeague(league = league).let { teams ->
-            if (teams is Result.Success)
-                TeamsUiState.Ready(teams = transformer.teamsToDisplayModel(teams = teams.data))
-            else
+            if (teams is Result.Failure)
                 TeamsUiState.Error
+            else
+                TeamsUiState.Idle
         }
     }
 
     fun getPersistedTeams() = viewModelScope.launch(context = dispatcher) {
-        _teamsUiState.value = interactor.getPersistedTeams().let { persistedTeams ->
-            if (persistedTeams is Result.Success)
-                TeamsUiState.Ready(teams = transformer.teamsToDisplayModel(teams = persistedTeams.data))
-            else
-                TeamsUiState.Error
+        interactor.getPersistedTeams().collect { persistedTeams ->
+            _teamsUiState.value =
+                TeamsUiState.Ready(transformer.teamsToDisplayModel(teams = persistedTeams))
         }
     }
 }

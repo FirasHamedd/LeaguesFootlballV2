@@ -8,6 +8,8 @@ import com.example.leaguesfootballv2.data.mock.TeamsMock
 import com.example.leaguesfootballv2.data.model.JsonTeams
 import com.example.leaguesfootballv2.data.transformer.TeamsToDomainTransformer
 import com.example.leaguesfootballv2.domain.model.TeamEntity
+import kotlinx.coroutines.flow.flowOf
+import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.test.runTest
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.Test
@@ -68,9 +70,10 @@ internal class TeamsRepositoryImplTest {
 
     @Test
     fun `fetchPersistedTeams - when local data source call is success - then should return Success with data`() =
-        runTest {
+        runBlocking {
             // Given
-            given(localTeamsDataSource.execute(param = Unit)).willReturn(TeamsJsonResponseMock.jsonTeams.teams)
+            val flow = flowOf(TeamsJsonResponseMock.jsonTeams.teams!!)
+            given(localTeamsDataSource.execute(param = Unit)).willReturn(flow)
             given(transformer.toDomain(jsonTeams = TeamsJsonResponseMock.jsonTeams.teams!!)).willReturn(
                 TeamsMock.teams
             )
@@ -79,6 +82,8 @@ internal class TeamsRepositoryImplTest {
             val result = repository.fetchPersistedTeams()
 
             // Then
-            assertThat(result).isEqualTo(Result.Success(data = TeamsMock.teams))
+            result.collect{
+                assertThat(it).isEqualTo(TeamsMock.teams)
+            }
         }
 }

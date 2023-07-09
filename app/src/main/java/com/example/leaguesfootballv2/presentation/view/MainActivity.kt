@@ -32,6 +32,8 @@ class MainActivity : AppCompatActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        leaguesViewModel.getAllLeagues()
+        leaguesViewModel.getPersistedTeams()
         setContent {
             navController = rememberNavController()
             NavHost(

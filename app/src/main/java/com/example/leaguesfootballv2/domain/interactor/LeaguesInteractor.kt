@@ -4,6 +4,7 @@ import com.example.leaguesfootballv2.core.Result
 import com.example.leaguesfootballv2.domain.model.TeamEntity
 import com.example.leaguesfootballv2.domain.repository.LeaguesRepository
 import com.example.leaguesfootballv2.domain.repository.TeamsRepository
+import kotlinx.coroutines.flow.map
 import javax.inject.Inject
 
 class LeaguesInteractor @Inject constructor(
@@ -20,14 +21,11 @@ class LeaguesInteractor @Inject constructor(
                 result
         }
 
-    suspend fun getPersistedTeams() = teamsRepository.fetchPersistedTeams().let { result ->
-        if (result is Result.Success)
-            Result.Success(result.data.sortDescendingWithHalfTeams())
-        else
-            result
-    }
+    suspend fun getPersistedTeams() =
+        teamsRepository.fetchPersistedTeams().map { persistedTeams ->
+            persistedTeams.sortDescendingWithHalfTeams()
+        }
 
     private fun List<TeamEntity>.sortDescendingWithHalfTeams() =
-        sortedByDescending { it.strTeam }.subList(0, (size + if (size % 2 == 0) 0 else 1) / 2)
-
+        sortedByDescending { it.strTeam }.take((size + if (size % 2 == 0) 0 else 1) / 2)
 }
