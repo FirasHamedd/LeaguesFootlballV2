@@ -63,6 +63,8 @@ dependencies {
     implementation "androidx.compose.material3:material3:$versions.compose.material_3"
     implementation "io.coil-kt:coil-compose:$versions.compose.coil"
     implementation "androidx.lifecycle:lifecycle-runtime-compose:$versions.compose.lifecycle_runtime"
+    implementation "androidx.navigation:navigation-runtime-ktx:$versions.compose.navigation"
+    implementation "androidx.navigation:navigation-compose:$versions.compose.navigation"
 
     // Kotlin
     implementation "org.jetbrains.kotlin:kotlin-reflect:$versions.kotlin"

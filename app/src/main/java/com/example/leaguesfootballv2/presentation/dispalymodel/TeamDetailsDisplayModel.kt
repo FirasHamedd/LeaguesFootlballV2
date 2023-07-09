@@ -1,11 +1,11 @@
 package com.example.leaguesfootballv2.presentation.dispalymodel
 
 data class TeamDetailsDisplayModel(
-    val teamName: String,
-    val teamBadge: String,
-    val teamShortName: String?,
-    val stadiumCapacity: Int,
-    val formedYear: Int,
-    val league: String,
-    val description: String?,
+    val teamName: String? = null,
+    val teamBadge: String? = null,
+    val teamShortName: String? = null,
+    val stadiumCapacity: Int? = null,
+    val formedYear: Int? = null,
+    val league: String? = null,
+    val description: String? = null,
 )

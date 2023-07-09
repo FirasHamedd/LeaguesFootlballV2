@@ -24,12 +24,16 @@ import com.example.leaguesfootballv2.presentation.dispalymodel.TeamDisplayModel
 import com.example.leaguesfootballv2.presentation.state.LeaguesUiState
 import com.example.leaguesfootballv2.presentation.state.TeamsUiState
 import com.example.leaguesfootballv2.presentation.view.composable.AutoCompleteSearchBar
+import com.example.leaguesfootballv2.presentation.view.composable.ScreenContent
 import com.example.leaguesfootballv2.presentation.viewmodel.LeaguesViewModel
 
 private const val COLUMNS_NUMBER = 2
 
 @Composable
-fun MainScreen(viewModel: LeaguesViewModel) {
+fun MainScreen(
+    viewModel: LeaguesViewModel,
+    onTeamClick: (String) -> Unit
+) {
     val allLeaguesUiState by viewModel.leaguesUiState.collectAsStateWithLifecycle()
     val teamsByLeagueUiState by viewModel.teamsUiState.collectAsStateWithLifecycle()
     LaunchedEffect(key1 = Unit) {
@@ -40,7 +44,7 @@ fun MainScreen(viewModel: LeaguesViewModel) {
         allLeaguesUiState = allLeaguesUiState,
         teamsByLeagueUiState = teamsByLeagueUiState,
         onTeamsSearch = { viewModel.getTeamsByLeague(league = it) },
-        onTeamClick = {}
+        onTeamClick = onTeamClick
     )
 }
 
@@ -51,79 +55,82 @@ fun MainScreenContent(
     onTeamsSearch: (String) -> Unit,
     onTeamClick: (String) -> Unit
 ) {
-    var allLeagues by remember { mutableStateOf(emptyList<String>()) }
-    var teams by remember { mutableStateOf(emptyList<TeamDisplayModel>()) }
-    val isUserTyping = remember { mutableStateOf(false) }
-    var isSearching by remember { mutableStateOf(false) }
+    ScreenContent(hasToolbar = false) {
+        var allLeagues by remember { mutableStateOf(emptyList<String>()) }
+        var teams by remember { mutableStateOf(emptyList<TeamDisplayModel>()) }
+        val isUserTyping = remember { mutableStateOf(false) }
+        var isSearching by remember { mutableStateOf(false) }
 
-    when (allLeaguesUiState) {
-        LeaguesUiState.Idle -> println("hooo idle")
-        LeaguesUiState.Loading -> println("hooo loading")
-        is LeaguesUiState.Ready -> allLeagues = allLeaguesUiState.leagues
-        LeaguesUiState.Error -> println("hooo Error")
-    }
-
-    when (teamsByLeagueUiState) {
-        TeamsUiState.Idle -> println("hooo idle")
-        is TeamsUiState.Ready -> {
-            teams = teamsByLeagueUiState.teams
-            isSearching = false
+        when (allLeaguesUiState) {
+            LeaguesUiState.Idle -> println("hooo idle")
+            LeaguesUiState.Loading -> println("hooo loading")
+            is LeaguesUiState.Ready -> allLeagues = allLeaguesUiState.leagues
+            LeaguesUiState.Error -> println("hooo Error")
         }
-        TeamsUiState.Error -> println("hooo Error")
-    }
 
-    Column(
-        modifier = Modifier
-            .fillMaxSize()
-            .background(
-                color = Color.White
-            )
-    ) {
-        AutoCompleteSearchBar(
-            modifier = Modifier.fillMaxWidth(),
-            items = allLeagues,
-            isUserTyping = isUserTyping,
-            onSearchClicked = {
-                isSearching = true
-                onTeamsSearch(it)
-            },
-        )
-
-        if (isSearching) {
-            Box(
-                modifier = Modifier
-                    .fillMaxSize()
-            ) {
-                CircularProgressIndicator(
-                    modifier = Modifier.align(Alignment.Center)
-                )
+        when (teamsByLeagueUiState) {
+            TeamsUiState.Idle -> println("hooo idle")
+            is TeamsUiState.Ready -> {
+                teams = teamsByLeagueUiState.teams
+                isSearching = false
             }
-        } else {
-            LazyVerticalGrid(
-                modifier = Modifier
-                    .blur(if (isUserTyping.value) 12.dp else 0.dp)
-                    .fillMaxSize()
-                    .background(if (isUserTyping.value) Color.DarkGray else Color.White),
-                columns = GridCells.Fixed(COLUMNS_NUMBER)
-            ) {
-                items(teams) { team ->
-                    AsyncImage(
-                        modifier = Modifier
-                            .clickable {
-                                onTeamClick(team.teamId)
-                            }
-                            .padding(all = 16.dp),
-                        alignment = Alignment.Center,
-                        model = ImageRequest.Builder(LocalContext.current)
-                            .data(team.teamLogo)
-                            .crossfade(true)
-                            .build(),
-                        placeholder = painterResource(id = R.drawable.placeholder),
-                        contentDescription = null,
+            TeamsUiState.Error -> println("hooo Error")
+        }
+
+        Column(
+            modifier = Modifier
+                .fillMaxSize()
+                .background(
+                    color = Color.White
+                )
+        ) {
+            AutoCompleteSearchBar(
+                modifier = Modifier.fillMaxWidth(),
+                items = allLeagues,
+                isUserTyping = isUserTyping,
+                onSearchClicked = {
+                    isSearching = true
+                    onTeamsSearch(it)
+                },
+            )
+
+            if (isSearching) {
+                Box(
+                    modifier = Modifier
+                        .fillMaxSize()
+                ) {
+                    CircularProgressIndicator(
+                        modifier = Modifier.align(Alignment.Center)
                     )
+                }
+            } else {
+                LazyVerticalGrid(
+                    modifier = Modifier
+                        .blur(if (isUserTyping.value) 12.dp else 0.dp)
+                        .fillMaxSize()
+                        .background(if (isUserTyping.value) Color.LightGray else Color.White),
+                    columns = GridCells.Fixed(COLUMNS_NUMBER)
+                ) {
+                    items(teams) { team ->
+                        AsyncImage(
+                            modifier = Modifier
+                                .clickable {
+                                    onTeamClick(team.teamId)
+                                }
+                                .padding(all = 16.dp),
+                            alignment = Alignment.Center,
+                            model = ImageRequest.Builder(LocalContext.current)
+                                .data(team.teamLogo)
+                                .crossfade(true)
+                                .build(),
+                            placeholder = painterResource(id = R.drawable.placeholder),
+                            contentDescription = null,
+                        )
+                    }
                 }
             }
         }
+
     }
 }
 

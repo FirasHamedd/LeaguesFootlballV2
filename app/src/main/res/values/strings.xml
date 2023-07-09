@@ -1,4 +1,8 @@
 <resources>
     <string name="app_name">LeaguesFootballV2</string>
     <string name="search_bar_placeholder">Search League</string>
+    <string name="team_league">League : %s</string>
+    <string name="team_formed_year">Formed On : %s</string>
+    <string name="team_stadium_capacity">Stadium Capacity : %s</string>
+    <string name="team_description">Description : %s</string>
 </resources>
