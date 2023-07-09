@@ -83,6 +83,11 @@ dependencies {
     implementation "com.google.dagger:hilt-android:$versions.hilt"
     kapt "com.google.dagger:hilt-compiler:$versions.hilt"
 
+    // Room
+    implementation "androidx.room:room-runtime:$versions.room"
+    kapt "androidx.room:room-compiler:$versions.room"
+    implementation "androidx.room:room-ktx:$versions.room"
+
     // Test
     testRuntimeOnly "org.junit.jupiter:junit-jupiter-engine:$versions.tests.jupiter_engine"
     testImplementation "junit:junit:$versions.tests.junit"

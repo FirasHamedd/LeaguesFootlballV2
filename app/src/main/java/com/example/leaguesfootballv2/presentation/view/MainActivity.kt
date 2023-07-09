@@ -1,8 +1,8 @@
 package com.example.leaguesfootballv2.presentation.view
 
-import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import androidx.activity.compose.setContent
+import androidx.appcompat.app.AppCompatActivity
 import com.example.leaguesfootballv2.presentation.viewmodel.LeaguesViewModel
 import dagger.hilt.android.AndroidEntryPoint
 import javax.inject.Inject
@@ -15,7 +15,6 @@ class MainActivity : AppCompatActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        viewModel.getAllLeagues()
         setContent {
             MainScreen(viewModel = viewModel)
         }

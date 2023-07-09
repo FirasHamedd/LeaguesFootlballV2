@@ -2,8 +2,8 @@ package com.example.leaguesfootballv2.presentation.viewmodel
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.example.leaguesfootballv2.core.di.IoDispatcher
 import com.example.leaguesfootballv2.core.Result
+import com.example.leaguesfootballv2.core.di.IoDispatcher
 import com.example.leaguesfootballv2.domain.interactor.LeaguesInteractor
 import com.example.leaguesfootballv2.presentation.state.LeaguesUiState
 import com.example.leaguesfootballv2.presentation.state.TeamsUiState
@@ -37,6 +37,15 @@ class LeaguesViewModel @Inject constructor(
         _teamsUiState.value = interactor.getTeamsByLeague(league = league).let { teams ->
             if (teams is Result.Success)
                 TeamsUiState.Ready(teamsPics = teams.data.map { it.strTeamBadge })
+            else
+                TeamsUiState.Error
+        }
+    }
+
+    fun getPersistedTeams() = viewModelScope.launch(context = dispatcher) {
+        _teamsUiState.value = interactor.getPersistedTeams().let { persistedTeams ->
+            if (persistedTeams is Result.Success)
+                TeamsUiState.Ready(teamsPics = persistedTeams.data.map { it.strTeamBadge })
             else
                 TeamsUiState.Error
         }

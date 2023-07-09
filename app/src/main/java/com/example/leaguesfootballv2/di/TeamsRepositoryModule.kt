@@ -1,5 +1,6 @@
 package com.example.leaguesfootballv2.di
 
+import com.example.leaguesfootballv2.data.datasource.LocalTeamsDataSource
 import com.example.leaguesfootballv2.data.datasource.TeamsDataSource
 import com.example.leaguesfootballv2.data.repository.TeamsRepositoryImpl
 import com.example.leaguesfootballv2.data.transformer.TeamsToDomainTransformer
@@ -16,9 +17,11 @@ class TeamsRepositoryModule {
     @Provides
     fun provideTeamsRepository(
         teamsDataSource: TeamsDataSource,
-        transformer: TeamsToDomainTransformer
+        transformer: TeamsToDomainTransformer,
+        localTeamsDataSource: LocalTeamsDataSource
     ): TeamsRepository = TeamsRepositoryImpl(
         teamsDataSource = teamsDataSource,
-        transformer = transformer
+        transformer = transformer,
+        localTeamsDataSource = localTeamsDataSource
     )
 }

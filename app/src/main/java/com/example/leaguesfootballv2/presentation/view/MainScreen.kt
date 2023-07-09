@@ -5,17 +5,19 @@ import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.grid.GridCells
 import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
 import androidx.compose.foundation.lazy.grid.items
-import androidx.compose.material.*
+import androidx.compose.material.CircularProgressIndicator
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import coil.compose.AsyncImage
 import coil.request.ImageRequest
+import com.example.leaguesfootballv2.R
 import com.example.leaguesfootballv2.presentation.state.LeaguesUiState
 import com.example.leaguesfootballv2.presentation.state.TeamsUiState
 import com.example.leaguesfootballv2.presentation.view.composable.AutoCompleteSearchBar
@@ -25,6 +27,10 @@ import com.example.leaguesfootballv2.presentation.viewmodel.LeaguesViewModel
 fun MainScreen(viewModel: LeaguesViewModel) {
     val allLeaguesUiState by viewModel.leaguesUiState.collectAsStateWithLifecycle()
     val teamsByLeagueUiState by viewModel.teamsUiState.collectAsStateWithLifecycle()
+    LaunchedEffect(key1 = Unit) {
+        viewModel.getAllLeagues()
+        viewModel.getPersistedTeams()
+    }
     MainScreenContent(
         allLeaguesUiState = allLeaguesUiState,
         teamsByLeagueUiState = teamsByLeagueUiState,
@@ -73,7 +79,6 @@ fun MainScreenContent(
             onSearchClicked = {
                 isSearching = true
                 onTeamsSearch(it)
-                println("hooo $it")
             },
         )
 
@@ -102,6 +107,7 @@ fun MainScreenContent(
                             .data(picUrl)
                             .crossfade(true)
                             .build(),
+                        placeholder = painterResource(id = R.drawable.placeholder),
                         contentDescription = null,
                     )
                 }

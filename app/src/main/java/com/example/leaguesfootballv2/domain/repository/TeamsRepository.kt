@@ -6,4 +6,6 @@ import com.example.leaguesfootballv2.domain.model.TeamEntity
 interface TeamsRepository {
 
     suspend fun fetchTeamsByLeague(league: String): Result<List<TeamEntity>>
+
+    suspend fun fetchPersistedTeamsPics(): Result<List<TeamEntity>>
 }

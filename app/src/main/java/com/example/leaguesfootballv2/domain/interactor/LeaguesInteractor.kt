@@ -12,4 +12,6 @@ class LeaguesInteractor @Inject constructor(
 
     suspend fun getTeamsByLeague(league: String) =
         teamsRepository.fetchTeamsByLeague(league = league)
+
+    suspend fun getPersistedTeams() = teamsRepository.fetchPersistedTeamsPics()
 }
