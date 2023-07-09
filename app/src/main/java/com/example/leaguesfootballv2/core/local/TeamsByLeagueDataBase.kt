@@ -7,4 +7,5 @@ import com.example.leaguesfootballv2.data.model.JsonTeam
 @Database(entities = [JsonTeam::class], version = 1)
 abstract class TeamsByLeagueDataBase : RoomDatabase() {
     abstract fun teamsByLeagueDao(): TeamsByLeagueDao
+    abstract fun teamDetailsDao(): TeamDetailsDao
 }

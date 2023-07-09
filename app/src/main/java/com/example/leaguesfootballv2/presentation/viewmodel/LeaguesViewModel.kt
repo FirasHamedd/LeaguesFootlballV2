@@ -7,6 +7,7 @@ import com.example.leaguesfootballv2.core.di.IoDispatcher
 import com.example.leaguesfootballv2.domain.interactor.LeaguesInteractor
 import com.example.leaguesfootballv2.presentation.state.LeaguesUiState
 import com.example.leaguesfootballv2.presentation.state.TeamsUiState
+import com.example.leaguesfootballv2.presentation.transformer.TeamsToDisplayTransformer
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -15,7 +16,8 @@ import javax.inject.Inject
 
 class LeaguesViewModel @Inject constructor(
     private val interactor: LeaguesInteractor,
-    @IoDispatcher private val dispatcher: CoroutineDispatcher
+    @IoDispatcher private val dispatcher: CoroutineDispatcher,
+    private val transformer: TeamsToDisplayTransformer
 ) : ViewModel() {
 
     private var _leaguesUiState = MutableStateFlow<LeaguesUiState>(value = LeaguesUiState.Idle)
@@ -36,7 +38,7 @@ class LeaguesViewModel @Inject constructor(
     fun getTeamsByLeague(league: String) = viewModelScope.launch(context = dispatcher) {
         _teamsUiState.value = interactor.getTeamsByLeague(league = league).let { teams ->
             if (teams is Result.Success)
-                TeamsUiState.Ready(teamsPics = teams.data.map { it.strTeamBadge })
+                TeamsUiState.Ready(teams = transformer.teamsToDisplayModel(teams = teams.data))
             else
                 TeamsUiState.Error
         }
@@ -45,7 +47,7 @@ class LeaguesViewModel @Inject constructor(
     fun getPersistedTeams() = viewModelScope.launch(context = dispatcher) {
         _teamsUiState.value = interactor.getPersistedTeams().let { persistedTeams ->
             if (persistedTeams is Result.Success)
-                TeamsUiState.Ready(teamsPics = persistedTeams.data.map { it.strTeamBadge })
+                TeamsUiState.Ready(teams = transformer.teamsToDisplayModel(teams = persistedTeams.data))
             else
                 TeamsUiState.Error
         }

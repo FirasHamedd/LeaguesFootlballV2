@@ -2,6 +2,7 @@ package com.example.leaguesfootballv2.core.di
 
 import android.content.Context
 import androidx.room.Room
+import com.example.leaguesfootballv2.core.local.TeamDetailsDao
 import com.example.leaguesfootballv2.core.local.TeamsByLeagueDao
 import com.example.leaguesfootballv2.core.local.TeamsByLeagueDataBase
 import dagger.Module
@@ -18,6 +19,11 @@ class LocalDataBaseModule {
     @Provides
     fun provideTeamsDao(database: TeamsByLeagueDataBase): TeamsByLeagueDao {
         return database.teamsByLeagueDao()
+    }
+
+    @Provides
+    fun provideTeamDetailsDao(database: TeamsByLeagueDataBase): TeamDetailsDao {
+        return database.teamDetailsDao()
     }
 
     @Provides

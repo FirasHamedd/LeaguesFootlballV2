@@ -16,8 +16,8 @@ class TeamsRepositoryImpl @Inject constructor(
 
     override suspend fun fetchTeamsByLeague(league: String): Result<List<TeamEntity>> = try {
         teamsDataSource.execute(param = league).teams?.let { jsonTeams ->
-                localTeamsDataSource.save(teams = jsonTeams)
-                Result.Success(data = transformer.toDomain(jsonTeams = jsonTeams))
+            localTeamsDataSource.save(teams = jsonTeams)
+            Result.Success(data = transformer.toDomain(jsonTeams = jsonTeams))
         } ?: Result.Failure("No Teams for your search")
     } catch (e: Exception) {
         Result.Failure(exception = e)
@@ -28,6 +28,6 @@ class TeamsRepositoryImpl @Inject constructor(
             Result.Success(data = transformer.toDomain(jsonTeams = jsonTeams))
         }
     } catch (e: Exception) {
-        Result.Failure(exception = e)
+        Result.Failure()
     }
 }
