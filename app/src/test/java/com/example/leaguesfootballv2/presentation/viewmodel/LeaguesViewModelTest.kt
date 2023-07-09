@@ -4,8 +4,10 @@ import com.example.leaguesfootballv2.core.Result
 import com.example.leaguesfootballv2.data.mock.AllLeaguesMock
 import com.example.leaguesfootballv2.data.mock.TeamsMock
 import com.example.leaguesfootballv2.domain.interactor.LeaguesInteractor
+import com.example.leaguesfootballv2.presentation.dispalymodel.TeamDisplayModel
 import com.example.leaguesfootballv2.presentation.state.LeaguesUiState
 import com.example.leaguesfootballv2.presentation.state.TeamsUiState
+import com.example.leaguesfootballv2.presentation.transformer.TeamsToDisplayTransformer
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.test.*
@@ -26,6 +28,9 @@ internal class LeaguesViewModelTest {
     @Mock
     private lateinit var interactor: LeaguesInteractor
 
+    @Mock
+    private lateinit var transformer: TeamsToDisplayTransformer
+
     private lateinit var viewModel: LeaguesViewModel
 
     private val scheduler: TestCoroutineScheduler = TestCoroutineScheduler()
@@ -37,7 +42,8 @@ internal class LeaguesViewModelTest {
         Dispatchers.setMain(testDispatcher)
         viewModel = LeaguesViewModel(
             interactor = interactor,
-            dispatcher = testDispatcher
+            dispatcher = testDispatcher,
+            transformer = transformer
         )
     }
 
@@ -82,7 +88,20 @@ internal class LeaguesViewModelTest {
     @Test
     fun `getTeamsByLeague - when Result is Success - then should update teamsUiState`() = runTest {
         // Given
+        val displayModels = listOf(
+            TeamDisplayModel(
+                teamId = "14444",
+                teamName = "Arsenal",
+                teamLogo = "arsenalBageUrl"
+            ),
+            TeamDisplayModel(
+                teamId = "133604",
+                teamName = "Manchester United",
+                teamLogo = "manchesterBageUrl"
+            ),
+        )
         given(interactor.getTeamsByLeague(league = "league")).willReturn(Result.Success(data = TeamsMock.teams))
+        given(transformer.teamsToDisplayModel(teams = TeamsMock.teams)).willReturn(displayModels)
 
         // When
         viewModel.getTeamsByLeague(league = "league")
@@ -90,12 +109,7 @@ internal class LeaguesViewModelTest {
         // Then
         scheduler.advanceUntilIdle()
         assertThat(viewModel.teamsUiState.value).isEqualTo(
-            TeamsUiState.Ready(
-                teamsPics = listOf(
-                    "arsenalBageUrl",
-                    "manchesterBageUrl"
-                )
-            )
+            TeamsUiState.Ready(teams = displayModels)
         )
     }
 
@@ -115,7 +129,20 @@ internal class LeaguesViewModelTest {
     @Test
     fun `getPersistedTeams - when Result is Success - then should update teamsUiState`() = runTest {
         // Given
+        val displayModels = listOf(
+            TeamDisplayModel(
+                teamId = "14444",
+                teamName = "Arsenal",
+                teamLogo = "arsenalBageUrl"
+            ),
+            TeamDisplayModel(
+                teamId = "133604",
+                teamName = "Manchester United",
+                teamLogo = "manchesterBageUrl"
+            ),
+        )
         given(interactor.getPersistedTeams()).willReturn(Result.Success(data = TeamsMock.teams))
+        given(transformer.teamsToDisplayModel(teams = TeamsMock.teams)).willReturn(displayModels)
 
         // When
         viewModel.getPersistedTeams()
@@ -123,12 +150,7 @@ internal class LeaguesViewModelTest {
         // Then
         scheduler.advanceUntilIdle()
         assertThat(viewModel.teamsUiState.value).isEqualTo(
-            TeamsUiState.Ready(
-                teamsPics = listOf(
-                    "arsenalBageUrl",
-                    "manchesterBageUrl"
-                )
-            )
+            TeamsUiState.Ready(teams = displayModels)
         )
     }
 

@@ -65,4 +65,20 @@ internal class TeamsRepositoryImplTest {
             // Then
             assertThat(result).isEqualTo(Result.Failure<List<TeamEntity>>("No Teams for your search"))
         }
+
+    @Test
+    fun `fetchPersistedTeams - when local data source call is success - then should return Success with data`() =
+        runTest {
+            // Given
+            given(localTeamsDataSource.execute(param = Unit)).willReturn(TeamsJsonResponseMock.jsonTeams.teams)
+            given(transformer.toDomain(jsonTeams = TeamsJsonResponseMock.jsonTeams.teams!!)).willReturn(
+                TeamsMock.teams
+            )
+
+            // When
+            val result = repository.fetchPersistedTeams()
+
+            // Then
+            assertThat(result).isEqualTo(Result.Success(data = TeamsMock.teams))
+        }
 }
