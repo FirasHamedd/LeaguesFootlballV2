@@ -23,7 +23,7 @@ class TeamsRepositoryImpl @Inject constructor(
         Result.Failure(exception = e)
     }
 
-    override suspend fun fetchPersistedTeamsPics(): Result<List<TeamEntity>> = try {
+    override suspend fun fetchPersistedTeams(): Result<List<TeamEntity>> = try {
         localTeamsDataSource.execute(param = Unit).let { jsonTeams ->
             Result.Success(data = transformer.toDomain(jsonTeams = jsonTeams))
         }

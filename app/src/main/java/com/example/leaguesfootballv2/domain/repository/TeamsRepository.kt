@@ -7,5 +7,5 @@ interface TeamsRepository {
 
     suspend fun fetchTeamsByLeague(league: String): Result<List<TeamEntity>>
 
-    suspend fun fetchPersistedTeamsPics(): Result<List<TeamEntity>>
+    suspend fun fetchPersistedTeams(): Result<List<TeamEntity>>
 }
