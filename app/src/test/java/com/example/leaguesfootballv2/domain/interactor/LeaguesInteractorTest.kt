@@ -42,4 +42,14 @@ internal class LeaguesInteractorTest {
         then(teamsRepository).should().fetchTeamsByLeague("league")
         then(teamsRepository).shouldHaveNoMoreInteractions()
     }
+
+    @Test
+    fun getPersistedTeams() = runTest {
+        // When
+        interactor.getPersistedTeams()
+
+        // Then
+        then(teamsRepository).should().fetchPersistedTeamsPics()
+        then(teamsRepository).shouldHaveNoMoreInteractions()
+    }
 }

@@ -12,7 +12,7 @@ internal class TeamsToDomainTransformerTest {
     @Test
     fun `toDomain - should return list of LeagueEntity`() {
         // When
-        val result = transformer.toDomain(jsonTeams = TeamsJsonResponseMock.jsonTeams)
+        val result = transformer.toDomain(jsonTeams = TeamsJsonResponseMock.jsonTeams.teams!!)
 
         // Then
         assertThat(result).isEqualTo(TeamsMock.teams)

@@ -111,4 +111,37 @@ internal class LeaguesViewModelTest {
         scheduler.advanceUntilIdle()
         assertThat(viewModel.teamsUiState.value).isEqualTo(TeamsUiState.Error)
     }
+
+    @Test
+    fun `getPersistedTeams - when Result is Success - then should update teamsUiState`() = runTest {
+        // Given
+        given(interactor.getPersistedTeams()).willReturn(Result.Success(data = TeamsMock.teams))
+
+        // When
+        viewModel.getPersistedTeams()
+
+        // Then
+        scheduler.advanceUntilIdle()
+        assertThat(viewModel.teamsUiState.value).isEqualTo(
+            TeamsUiState.Ready(
+                teamsPics = listOf(
+                    "arsenalBageUrl",
+                    "manchesterBageUrl"
+                )
+            )
+        )
+    }
+
+    @Test
+    fun `getPersistedTeams - when Result is Failure - then should update teamsUiState`() = runTest {
+        // Given
+        given(interactor.getPersistedTeams()).willReturn(Result.Failure())
+
+        // When
+        viewModel.getPersistedTeams()
+
+        // Then
+        scheduler.advanceUntilIdle()
+        assertThat(viewModel.teamsUiState.value).isEqualTo(TeamsUiState.Error)
+    }
 }
