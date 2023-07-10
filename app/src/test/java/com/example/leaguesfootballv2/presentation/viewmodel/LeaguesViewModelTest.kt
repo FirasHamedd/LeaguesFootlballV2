@@ -96,7 +96,7 @@ internal class LeaguesViewModelTest {
 
         // Then
         scheduler.advanceUntilIdle()
-        assertThat(viewModel.teamsUiState.value).isEqualTo(TeamsUiState.Idle)
+        assertThat(viewModel.teamsUiState.value).isEqualTo(TeamsUiState.Ready)
     }
 
     @Test
@@ -136,8 +136,6 @@ internal class LeaguesViewModelTest {
 
         // Then
         scheduler.advanceUntilIdle()
-        assertThat(viewModel.teamsUiState.value).isEqualTo(
-            TeamsUiState.Ready(teams = displayModels)
-        )
+        assertThat(viewModel.persistedTeams.value).isEqualTo(displayModels)
     }
 }

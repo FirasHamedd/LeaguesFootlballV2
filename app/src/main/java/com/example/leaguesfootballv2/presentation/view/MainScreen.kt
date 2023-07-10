@@ -2,11 +2,13 @@ package com.example.leaguesfootballv2.presentation.view
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
-import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.grid.GridCells
 import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
 import androidx.compose.foundation.lazy.grid.items
-import androidx.compose.material.CircularProgressIndicator
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -24,6 +26,8 @@ import com.example.leaguesfootballv2.presentation.dispalymodel.TeamDisplayModel
 import com.example.leaguesfootballv2.presentation.state.LeaguesUiState
 import com.example.leaguesfootballv2.presentation.state.TeamsUiState
 import com.example.leaguesfootballv2.presentation.view.composable.AutoCompleteSearchBar
+import com.example.leaguesfootballv2.presentation.view.composable.CircularLoader
+import com.example.leaguesfootballv2.presentation.view.composable.CommonGeneralError
 import com.example.leaguesfootballv2.presentation.view.composable.ScreenContent
 import com.example.leaguesfootballv2.presentation.viewmodel.LeaguesViewModel
 
@@ -36,11 +40,14 @@ fun MainScreen(
 ) {
     val allLeaguesUiState by viewModel.leaguesUiState.collectAsStateWithLifecycle()
     val teamsByLeagueUiState by viewModel.teamsUiState.collectAsStateWithLifecycle()
+    val teams by viewModel.persistedTeams.collectAsStateWithLifecycle()
     MainScreenContent(
         allLeaguesUiState = allLeaguesUiState,
         teamsByLeagueUiState = teamsByLeagueUiState,
+        teams = teams,
         onTeamsSearch = { viewModel.getTeamsByLeague(league = it) },
-        onTeamClick = onTeamClick
+        onTeamClick = onTeamClick,
+        resetStates = { viewModel.resetState() }
     )
 }
 
@@ -48,85 +55,94 @@ fun MainScreen(
 fun MainScreenContent(
     allLeaguesUiState: LeaguesUiState,
     teamsByLeagueUiState: TeamsUiState,
+    teams: List<TeamDisplayModel>,
     onTeamsSearch: (String) -> Unit,
-    onTeamClick: (String) -> Unit
+    onTeamClick: (String) -> Unit,
+    resetStates: () -> Unit
 ) {
     ScreenContent(hasToolbar = false) {
         var allLeagues by remember { mutableStateOf(emptyList<String>()) }
-        var teams by remember { mutableStateOf(emptyList<TeamDisplayModel>()) }
         val isUserTyping = remember { mutableStateOf(false) }
         var isSearching by remember { mutableStateOf(false) }
+        var isLeaguesLoading by remember { mutableStateOf(false) }
+        val isGeneralCommonErrorDialogVisible = remember { mutableStateOf(false) }
 
         when (allLeaguesUiState) {
-            LeaguesUiState.Idle -> println("hooo idle")
-            LeaguesUiState.Loading -> println("hooo loading")
-            is LeaguesUiState.Ready -> allLeagues = allLeaguesUiState.leagues
-            LeaguesUiState.Error -> println("hooo Error")
+            LeaguesUiState.Idle -> Unit
+            LeaguesUiState.Loading -> isLeaguesLoading = true
+            is LeaguesUiState.Ready -> {
+                isLeaguesLoading = false
+                allLeagues = allLeaguesUiState.leagues
+            }
+            LeaguesUiState.Error -> {
+                isLeaguesLoading = true
+                isGeneralCommonErrorDialogVisible.value = true
+            }
         }
 
         when (teamsByLeagueUiState) {
-            TeamsUiState.Idle -> println("hooo idle")
-            is TeamsUiState.Ready -> {
-                teams = teamsByLeagueUiState.teams
+            TeamsUiState.Idle -> Unit
+            is TeamsUiState.Ready -> isSearching = false
+            TeamsUiState.Error -> {
+                isGeneralCommonErrorDialogVisible.value = true
                 isSearching = false
             }
-            TeamsUiState.Error -> println("hooo Error")
         }
 
-        Column(
-            modifier = Modifier
-                .fillMaxSize()
-                .background(
-                    color = Color.White
-                )
-        ) {
-            AutoCompleteSearchBar(
-                modifier = Modifier.fillMaxWidth(),
-                items = allLeagues,
-                isUserTyping = isUserTyping,
-                onSearchClicked = {
-                    isSearching = true
-                    onTeamsSearch(it)
-                },
-            )
-
-            if (isSearching) {
-                Box(
-                    modifier = Modifier
-                        .fillMaxSize()
-                ) {
-                    CircularProgressIndicator(
-                        modifier = Modifier.align(Alignment.Center)
+        if (isLeaguesLoading) {
+            CircularLoader()
+        } else {
+            Column(
+                modifier = Modifier
+                    .fillMaxSize()
+                    .background(
+                        color = Color.White
                     )
-                }
-            } else {
-                LazyVerticalGrid(
-                    modifier = Modifier
-                        .blur(if (isUserTyping.value) 12.dp else 0.dp)
-                        .fillMaxSize()
-                        .background(if (isUserTyping.value) Color.LightGray else Color.White),
-                    columns = GridCells.Fixed(COLUMNS_NUMBER)
-                ) {
-                    items(teams) { team ->
-                        AsyncImage(
-                            modifier = Modifier
-                                .clickable {
-                                    onTeamClick(team.teamId)
-                                }
-                                .padding(all = 16.dp),
-                            alignment = Alignment.Center,
-                            model = ImageRequest.Builder(LocalContext.current)
-                                .data(team.teamLogo)
-                                .crossfade(true)
-                                .build(),
-                            placeholder = painterResource(id = R.drawable.placeholder),
-                            contentDescription = null,
-                        )
+            ) {
+                AutoCompleteSearchBar(
+                    modifier = Modifier.fillMaxWidth(),
+                    items = allLeagues,
+                    isUserTyping = isUserTyping,
+                    onSearchClicked = {
+                        isSearching = true
+                        onTeamsSearch(it)
+                    },
+                )
+
+                if (isSearching) {
+                    CircularLoader()
+                } else {
+                    LazyVerticalGrid(
+                        modifier = Modifier
+                            .blur(if (isUserTyping.value) 12.dp else 0.dp)
+                            .fillMaxSize()
+                            .background(if (isUserTyping.value) Color.LightGray else Color.White),
+                        columns = GridCells.Fixed(COLUMNS_NUMBER)
+                    ) {
+                        items(teams) { team ->
+                            AsyncImage(
+                                modifier = Modifier
+                                    .clickable {
+                                        onTeamClick(team.teamId)
+                                    }
+                                    .padding(all = 16.dp),
+                                alignment = Alignment.Center,
+                                model = ImageRequest.Builder(LocalContext.current)
+                                    .data(team.teamLogo)
+                                    .crossfade(true)
+                                    .build(),
+                                placeholder = painterResource(id = R.drawable.placeholder),
+                                contentDescription = null,
+                            )
+                        }
                     }
                 }
             }
         }
-
+        CommonGeneralError(
+            shouldShowDialogState = isGeneralCommonErrorDialogVisible,
+            onErrorDialogClosed = resetStates
+        )
     }
 }
 
@@ -144,41 +160,41 @@ fun MainScreenPreview() {
                 "Serie A"
             )
         ),
-        teamsByLeagueUiState = TeamsUiState.Ready(
-            teams = listOf(
-                TeamDisplayModel(
-                    teamId = "14444",
-                    teamName = "Arsenal",
-                    teamLogo = "https://www.thesportsdb.com/images/media/team/badge/q3bx641635067495.png"
-                ),
-                TeamDisplayModel(
-                    teamId = "133604",
-                    teamName = "Manchester United",
-                    teamLogo = "https://www.thesportsdb.com/images/media/team/badge/yk7swg1547214677.png"
-                ),
-                TeamDisplayModel(
-                    teamId = "14444",
-                    teamName = "Arsenal",
-                    teamLogo = "https://www.thesportsdb.com/images/media/team/badge/n06q811667936857.png"
-                ),
-                TeamDisplayModel(
-                    teamId = "133604",
-                    teamName = "Manchester United",
-                    teamLogo = "https://www.thesportsdb.com/images/media/team/badge/d89tpa1589898020.png"
-                ),
-                TeamDisplayModel(
-                    teamId = "14444",
-                    teamName = "Arsenal",
-                    teamLogo = "https://www.thesportsdb.com/images/media/team/badge/q3bx641635067495.png"
-                ),
-                TeamDisplayModel(
-                    teamId = "133604",
-                    teamName = "Manchester United",
-                    teamLogo = "https://www.thesportsdb.com/images/media/team/badge/n06q811667936857.png"
-                ),
-            )
+        teamsByLeagueUiState = TeamsUiState.Ready,
+        teams = listOf(
+            TeamDisplayModel(
+                teamId = "14444",
+                teamName = "Arsenal",
+                teamLogo = "https://www.thesportsdb.com/images/media/team/badge/q3bx641635067495.png"
+            ),
+            TeamDisplayModel(
+                teamId = "133604",
+                teamName = "Manchester United",
+                teamLogo = "https://www.thesportsdb.com/images/media/team/badge/yk7swg1547214677.png"
+            ),
+            TeamDisplayModel(
+                teamId = "14444",
+                teamName = "Arsenal",
+                teamLogo = "https://www.thesportsdb.com/images/media/team/badge/n06q811667936857.png"
+            ),
+            TeamDisplayModel(
+                teamId = "133604",
+                teamName = "Manchester United",
+                teamLogo = "https://www.thesportsdb.com/images/media/team/badge/d89tpa1589898020.png"
+            ),
+            TeamDisplayModel(
+                teamId = "14444",
+                teamName = "Arsenal",
+                teamLogo = "https://www.thesportsdb.com/images/media/team/badge/q3bx641635067495.png"
+            ),
+            TeamDisplayModel(
+                teamId = "133604",
+                teamName = "Manchester United",
+                teamLogo = "https://www.thesportsdb.com/images/media/team/badge/n06q811667936857.png"
+            ),
         ),
         onTeamsSearch = {},
-        onTeamClick = {}
+        onTeamClick = {},
+        resetStates = {}
     )
 }

@@ -100,6 +100,7 @@ fun AutoCompleteSearchBar(
             ) {
                 items(leagues) { item ->
                     Surface(modifier = Modifier.clickable {
+                        searchText = item
                         onSearchClicked(item)
                         isUserTyping.value = false
                         keyboardController?.hide()

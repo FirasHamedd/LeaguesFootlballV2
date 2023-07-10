@@ -5,4 +5,6 @@
     <string name="team_formed_year">Formed On : %s</string>
     <string name="team_stadium_capacity">Stadium Capacity : %s</string>
     <string name="team_description">Description : %s</string>
+    <string name="common_general_dialog_button">OK</string>
+    <string name="common_general_dialog_message">Une erreur inattendue est survenue</string>
 </resources>
